@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_event.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_state.dart';
 import 'package:simple_auth_flutter_firebase_bloc/repository/user_repository.dart';
+import 'package:simple_auth_flutter_firebase_bloc/utils/validator.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required UserRepository userRepository})
@@ -18,6 +19,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthEventRegister event, Emitter<AuthState> emit) async {
     emit(AuthStateLoading());
     try {
+      if (!Validator.isValidEmail(event.email)) {
+        emit(AuthStateError('Invalid email'));
+        return;
+      }
+      if (!Validator.isValidPassword(event.password)) {
+        emit(AuthStateError('Invalid password'));
+        return;
+      }
       await _userRepository.signUpWithEmailAndPassword(
           event.email, event.password);
       emit(AuthenticatedState());
