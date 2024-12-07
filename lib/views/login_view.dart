@@ -73,19 +73,22 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthStateLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is AuthStateError) {
-            return Center(child: Text(state.message));
-          }
-
-          return _buildLoginPage();
-        },
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthStateError) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: Scaffold(
+        body: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthStateLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return _buildLoginPage();
+          },
+        ),
       ),
     );
   }

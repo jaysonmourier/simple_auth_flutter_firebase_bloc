@@ -20,11 +20,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthStateLoading());
     try {
       if (!Validator.isValidEmail(event.email)) {
-        emit(AuthStateError('Invalid email'));
+        emit(AuthStateError('Please, enter a valid email'));
         return;
       }
       if (!Validator.isValidPassword(event.password)) {
-        emit(AuthStateError('Invalid password'));
+        emit(AuthStateError(
+            'Please, enter a valid password (min 8 characters)'));
         return;
       }
       await _userRepository.signUpWithEmailAndPassword(

@@ -77,18 +77,22 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthStateLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
           if (state is AuthStateError) {
-            return Center(child: Text(state.message));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
           }
-
-          return _buildRegisterPage();
         },
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is AuthStateLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return _buildRegisterPage();
+          },
+        ),
       ),
     );
   }
