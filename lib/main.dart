@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_auth_flutter_firebase_bloc/app_router.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:simple_auth_flutter_firebase_bloc/repository/user_repository.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -22,7 +23,7 @@ class SimpleAuth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(),
+      create: (context) => AuthBloc(userRepository: UserRepository()),
       child: MaterialApp.router(
         title: 'Simple Auth',
         theme: ThemeData(
