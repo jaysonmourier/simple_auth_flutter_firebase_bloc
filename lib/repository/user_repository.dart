@@ -10,8 +10,15 @@ class UserRepository {
       final credential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       return credential.user;
-    } catch (e) {
-      throw Exception(e);
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      if (e.code == 'user-not-found') {
+        throw Exception('No user found for that email.');
+      } else if (e.code == 'invalid-credential') {
+        throw Exception('Wrong password provided for that user.');
+      } else {
+        throw Exception('Authentication failed. Please try again.');
+      }
     }
   }
 
@@ -22,8 +29,12 @@ class UserRepository {
       final credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       return credential.user;
-    } catch (e) {
-      throw Exception(e);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw Exception('The account already exists for that email.');
+      } else {
+        throw Exception('Authentication failed. Please try again.');
+      }
     }
   }
 
