@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_bloc.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_event.dart';
 import 'package:simple_auth_flutter_firebase_bloc/bloc/auth/auth_state.dart';
+import 'package:simple_auth_flutter_firebase_bloc/utils/validator.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -13,6 +14,7 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _email;
   late final TextEditingController _password;
 
@@ -31,7 +33,7 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _onRegisterButtonPressed() {
-    if (_email.text.isNotEmpty && _password.text.isNotEmpty) {
+    if (_formKey.currentState!.validate()) {
       context
           .read<AuthBloc>()
           .add(AuthEventRegister(_email.text, _password.text));
@@ -45,31 +47,56 @@ class _RegisterViewState extends State<RegisterView> {
   Widget _buildRegisterPage() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Register'),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: _email,
-            decoration: const InputDecoration(hintText: 'Email'),
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            controller: _password,
-            decoration: const InputDecoration(hintText: 'Password'),
-            obscureText: true,
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-              onPressed: _onRegisterButtonPressed,
-              child: const Text('Register')),
-          const SizedBox(height: 32.0),
-          // go to register page
-          TextButton(
-              onPressed: _onLoginButtonPressed,
-              child: const Text('Already have an account?')),
-        ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Register'),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              controller: _email,
+              decoration: const InputDecoration(hintText: 'Email'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Email is required';
+                }
+
+                if (!Validator.isValidEmail(value)) {
+                  return 'Invalid email';
+                }
+
+                return null;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            TextFormField(
+              controller: _password,
+              decoration: const InputDecoration(hintText: 'Password'),
+              obscureText: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Password is required';
+                }
+
+                if (!Validator.isValidPassword(value)) {
+                  return 'Invalid password';
+                }
+
+                return null;
+              },
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+                onPressed: _onRegisterButtonPressed,
+                child: const Text('Register')),
+            const SizedBox(height: 32.0),
+            // go to register page
+            TextButton(
+                onPressed: _onLoginButtonPressed,
+                child: const Text('Already have an account?')),
+          ],
+        ),
       ),
     );
   }
